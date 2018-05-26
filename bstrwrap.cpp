@@ -1166,6 +1166,15 @@ void CBString::tolower () {
 	}
 }
 
+void CBString::capitalize () {
+	// Makes the first character a capital letter
+	// The rest of the string does'nt change
+	// Will fail silently if if canno't make the capitalization
+	if (this->slen) {
+		(*this)[0] = toupper((*this)[0]);
+	}
+}
+
 void CBString::repeat (int count) {
 	count *= slen;
 	if (count == 0) {
@@ -1429,7 +1438,7 @@ size_t i;
 
 // Split functions.
 // CBString split function members
-CBStringList CBString::split (const unsigned char* c) const {
+CBStringList CBString::split (const unsigned char c) const {
 	CBStringList list;
 	list.split(*this, c);
 	return list;

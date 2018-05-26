@@ -344,6 +344,7 @@ struct CBString : public tagbstring {
 	}
 	void toupper ();
 	void tolower ();
+	void capitalize ();
 
 	// Write protection methods.
 	void writeprotect ();
