@@ -78,6 +78,8 @@ namespace Bstrlib {
 
 #ifdef BSTRLIB_THROWS_EXCEPTIONS
 #if defined(BSTRLIB_CAN_USE_STL)
+struct CBStringList; 
+
 struct CBStringException : public std::exception {
 private:
 	std::string msg;
@@ -348,12 +350,17 @@ struct CBString : public tagbstring {
 	void writeallow ();
 	inline bool iswriteprotected () const { return mlen <= 0; }
 
-	// Join methods.
 #if defined(BSTRLIB_CAN_USE_STL)
+	// Join methods.
 	void join (const struct CBStringList& l);
 	void join (const struct CBStringList& l, const CBString& sep);
 	void join (const struct CBStringList& l, char sep);
 	void join (const struct CBStringList& l, unsigned char sep);
+
+	// Split methods
+	CBStringList split (const unsigned char c=' ') const;
+	CBStringList split (const CBString& b=" ") const;
+	CBStringList splitstr (const CBString& b=" ") const;
 #endif
 
 	// CBStream methods

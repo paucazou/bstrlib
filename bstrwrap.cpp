@@ -1428,6 +1428,25 @@ size_t i;
 }
 
 // Split functions.
+// CBString split function members
+CBStringList CBString::split (const unsigned char* c) const {
+	CBStringList list;
+	list.split(*this, c);
+	return list;
+}
+CBStringList CBString::split (const CBString& b) const {
+	CBStringList list;
+	list.split(*this,b);
+	return list;
+}
+
+CBStringList CBString::splitstr (const CBString& b) const {
+	CBStringList list;
+	list.splitstr(*this, b);
+	return list;
+}
+
+//CBStringList split function members
 
 void CBStringList::split (const CBString& b, unsigned char splitChar) {
 int p, i;
