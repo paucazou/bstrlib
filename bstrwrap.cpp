@@ -1171,7 +1171,7 @@ void CBString::capitalize () {
 	// The rest of the string does'nt change
 	// Will fail silently if if canno't make the capitalization
 	if (this->slen) {
-		(*this)[0] = toupper((*this)[0]);
+		this->data[0] = std::toupper(this->data[0]);
 	}
 }
 

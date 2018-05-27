@@ -360,8 +360,8 @@ struct CBString : public tagbstring {
 
 	// Split methods
 	CBStringList split (const unsigned char c=' ') const;
-	CBStringList split (const CBString& b=" ") const;
-	CBStringList splitstr (const CBString& b=" ") const;
+	CBStringList split (const CBString& b) const;
+	CBStringList splitstr (const CBString& b) const;
 #endif
 
 	// CBStream methods
