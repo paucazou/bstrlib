@@ -15,6 +15,7 @@
 # define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include <cassert>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -1178,12 +1179,14 @@ void CBString::capitalize () {
 CBString CBString::getLine (const int linenb) const {
 	/* return the line at i */
 	CBString temp;
-	for (int cpos{0}, linepos{1}; linepos <= linenb && cpos < that.slen;++cpos) {
+	int linepos{1};
+	for (int cpos{0}; linepos <= linenb && cpos < that.slen;++cpos) {
 		if (that[cpos] == '\n')
 			++linepos;
 		else if (linepos == linenb)
 			temp += that[cpos];
 	}
+	assert(linepos >= linenb && "Line requested was not found");
 	return temp;
 }
 

@@ -368,6 +368,8 @@ struct CBString : public tagbstring {
 	CBStringList split (const CBString& b) const;
 	CBStringList splitstr (const CBString& b) const;
 #endif
+	// iterators
+	// TODO
 
 	// CBStream methods
 	int gets (bNgetc getcPtr, void * parm, char terminator = '\n');
