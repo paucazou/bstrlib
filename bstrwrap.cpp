@@ -1194,7 +1194,8 @@ CBString CBString::getLine (const int linenb) const {
 		else if (linepos == linenb)
 			temp += that[cpos];
 	}
-	assert(linepos >= linenb && "Line requested was not found");
+	if (linepos < linenb)
+		bstringThrow ("getLine: line requested was not found");
 	return temp;
 }
 
