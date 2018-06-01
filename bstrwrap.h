@@ -174,6 +174,9 @@ friend struct CBString;
 };
 
 struct CBString : public tagbstring {
+	private:
+		CBString& that{*this};
+	public:
 
 	// Constructors
 	CBString ();
@@ -345,6 +348,8 @@ struct CBString : public tagbstring {
 	void toupper ();
 	void tolower ();
 	void capitalize ();
+	// get the content of the line number... A line ends with '\n'. First line = 1
+	CBString getLine(const int) const;
 
 	// Write protection methods.
 	void writeprotect ();

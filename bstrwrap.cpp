@@ -1175,6 +1175,18 @@ void CBString::capitalize () {
 	}
 }
 
+CBString CBString::getLine (const int linenb) const {
+	/* return the line at i */
+	CBString temp;
+	for (int cpos{0}, linepos{1}; linepos <= linenb && cpos < that.slen;++cpos) {
+		if (that[cpos] == '\n')
+			++linepos;
+		else if (linepos == linenb)
+			temp += that[cpos];
+	}
+	return temp;
+}
+
 void CBString::repeat (int count) {
 	count *= slen;
 	if (count == 0) {
