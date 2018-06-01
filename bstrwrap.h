@@ -190,6 +190,7 @@ struct CBString : public tagbstring {
 	CBString (const void * blk, int len);
 	CBString (const std::string& s);
 	CBString (const int i);
+	CBString (const double i);
 
 #if defined(BSTRLIB_CAN_USE_STL)
 	CBString (const struct CBStringList& l);

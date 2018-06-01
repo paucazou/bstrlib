@@ -197,6 +197,9 @@ CBString::CBString (const std::string& s) : CBString::CBString (s.data()) {
 CBString::CBString (const int i): CBString::CBString{std::to_string(i)}{
 }
 
+CBString::CBString (const double i): CBString::CBString{std::to_string(i)}{
+}
+
 // Destructor.
 
 CBString::~CBString () {
