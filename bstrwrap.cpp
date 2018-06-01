@@ -191,6 +191,11 @@ CBString::CBString (const tagbstring& x) {
 		data[slen] = '\0';
 	}
 }
+CBString::CBString (const std::string& s) : CBString::CBString (s.data()) {
+}
+
+CBString::CBString (const int i): CBString::CBString{std::to_string(i)}{
+}
 
 // Destructor.
 

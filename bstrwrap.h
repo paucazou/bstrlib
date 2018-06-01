@@ -188,6 +188,8 @@ struct CBString : public tagbstring {
 	CBString (const tagbstring& x);
 	CBString (char c, int len);
 	CBString (const void * blk, int len);
+	CBString (const std::string& s);
+	CBString (const int i);
 
 #if defined(BSTRLIB_CAN_USE_STL)
 	CBString (const struct CBStringList& l);
