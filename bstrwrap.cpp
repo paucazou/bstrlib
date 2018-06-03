@@ -1288,23 +1288,32 @@ const UtfForRangeIter& UtfForRangeIter::operator ++ () {
 	next_char == errCh ? pos = -1 : ++pos;
 	return that;
 }
-#if 0
-void UtfForRangeIter::reset () {
+// Indexer
+UtfIndexer::UtfIndexer (const CBString& nstr) : str{nstr}
+{
+	reset();
+}
+void UtfIndexer::reset () {
 	// reset iterator
 	utf8IteratorUninit (this);
-	utf8IteratorInit (this,str->data, str->slen);
+	utf8IteratorInit (this,str.data, str.slen);
+	current_char = utf8IteratorGetNextCodePoint (this, errCh);
 }
-cpUcs4 getChar (int npos) {
+UtfIndexer& UtfIndexer::operator ++ () {
+	current_char = utf8IteratorGetNextCodePoint (this, errCh);
+	pos = current_char == errCh ? -1 : pos + 1;
+	return this;
+}
+cpUcs4 UtfIndexer::getChar (int npos) {
 	// get char at position pos
-	if (npos == pos)
-		return getCurrentChar();
 	if (npos < pos || pos == -1)
 		reset();
+	if (npos == pos)
+		return current_char;
 	while (npos != pos)
 		++that;
 	return current_char;
 }
-#endif
 // UTF-8 CBString
 UtfForRangeIter CBString::begin () const {
 	return UtfForRangeIter (this,0);

@@ -108,6 +108,22 @@ namespace Bstrlib {
 			cpUcs4 next_char{errCh};
 			UtfForRangeIter& that{*this};
 	};
+	class UtfIndexer : public utf8Iterator {
+		/* This iterator is used 
+		 * to get a specific UTF-8 value
+		 * inside the string.
+		 */
+		public:
+			UtfIndexer (const CBString& nstr);
+			const UtfIndexer& operator ++ ();
+			void reset ();
+			cpUcs4 getChar (int npos);
+		private:
+			int pos{0};
+			cpUcs4 current_char{errCh};
+			UtfIndexer& that{*this};
+			CBString & str;
+	};
 
 #ifdef BSTRLIB_THROWS_EXCEPTIONS
 #if defined(BSTRLIB_CAN_USE_STL)
@@ -207,7 +223,7 @@ friend struct CBString;
 struct CBString : public tagbstring {
 	private:
 		CBString& that{*this};
-		utf8Iterator iterator;
+		UtfIndexer indexer;
 	public:
 
 	// Constructors
