@@ -51,6 +51,7 @@
 
 #include <stdlib.h>
 #include "bstrlib.h"
+#include "buniutil.h"
 
 #ifdef __cplusplus
 
@@ -63,8 +64,10 @@
 #pragma warning 549 10
 #endif
 
-#include <vector>
+#include <codecvt>
+#include <locale>
 #include <string>
+#include <vector>
 
 #if defined(__WATCOMC__)
 #pragma warning 604 9
@@ -75,6 +78,36 @@
 #endif
 
 namespace Bstrlib {
+	struct CBString;
+
+	/* We define here a converter
+	 * which return correct UTF-8 chars
+	 * from cpUcs4 or cpUcs2
+	 * usage: utfconverter.to_bytes(c)
+	 */
+	extern std::wstring_convert<std::codecvt_utf8<char32_t>,char32_t> utfconverter;
+
+	// We define here a constant for a return error
+	// when iterating over utf-8 content
+	extern const cpUcs4 errCh;
+	
+	// Iterator
+	class UtfForRangeIter : public utf8Iterator {
+		/* Iterator that can be used only for iterating
+		 * over valid UTF-8 content.
+		 * It can be used in a for loop-range
+		 */
+		public:
+			UtfForRangeIter(const CBString* nstr, int npos = 0);
+			bool operator != (const UtfForRangeIter& other) const;
+			int operator * () ;
+			const UtfForRangeIter& operator ++ ();
+		private:
+			const CBString *str{nullptr};
+			int pos{0}; // end of string is -1
+			cpUcs4 next_char{errCh};
+			UtfForRangeIter& that{*this};
+	};
 
 #ifdef BSTRLIB_THROWS_EXCEPTIONS
 #if defined(BSTRLIB_CAN_USE_STL)
@@ -123,8 +156,6 @@ public:
 #else
 #define bstringThrow(er) {}
 #endif
-
-struct CBString;
 
 #ifdef _MSC_VER
 #pragma warning(disable:4512)
@@ -176,6 +207,7 @@ friend struct CBString;
 struct CBString : public tagbstring {
 	private:
 		CBString& that{*this};
+		utf8Iterator iterator;
 	public:
 
 	// Constructors
@@ -371,8 +403,26 @@ struct CBString : public tagbstring {
 	CBStringList split (const CBString& b) const;
 	CBStringList splitstr (const CBString& b) const;
 #endif
-	// iterators
-	// TODO
+	// UTF-8 support 
+	// In this section, position refers to the position 
+	// in UTF-8 format. Therefore, positions inside slen
+	// can be invalid.
+	// for range loop iterator
+	UtfForRangeIter begin () const;
+	UtfForRangeIter end () const;
+#if 0
+	// iterator used by at, rawAt, uRange
+	// at : a function returning utf-8 character at this position.
+	// It is designed for display.
+	const std::string uAt(int pos) const;
+	// rawAt : a function returning a cpUcs4
+	cpUcs4 uRawAt (int pos) const;
+	// uRange: CBString between start and stop
+	//CBString uRange (int start, int stop) const; TODO
+	// throw error if not found.
+#endif
+	//  number of utf-8 char
+	int uLength () const;
 
 	// CBStream methods
 	int gets (bNgetc getcPtr, void * parm, char terminator = '\n');

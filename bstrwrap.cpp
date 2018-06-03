@@ -64,6 +64,9 @@
 #endif
 
 namespace Bstrlib {
+	std::wstring_convert<std::codecvt_utf8<char32_t>,char32_t> utfconverter;
+	const cpUcs4 errCh{0xFF};
+
 
 // Constructors.
 
@@ -1177,8 +1180,9 @@ void CBString::tolower () {
 
 void CBString::capitalize () {
 	// Makes the first character a capital letter
-	// The rest of the string does'nt change
-	// Will fail silently if if canno't make the capitalization
+	// The rest of the string doesn't change
+	// Will fail silently if it canno't make the capitalization
+	// Doesn't work with UTF-8
 	if (this->slen) {
 		this->data[0] = std::toupper(this->data[0]);
 	}
@@ -1263,6 +1267,71 @@ void CBString::writeallow () {
 	else if (mlen < 0) {
 		bstringThrow ("Cannot unprotect a constant");
 	}
+}
+
+// UTF-8
+// Iterator
+UtfForRangeIter::UtfForRangeIter (const CBString *nstr, int npos) :
+	str{nstr}, pos{npos} {
+		utf8IteratorInit( this, nstr->data, nstr->slen);
+		next_char = utf8IteratorGetNextCodePoint (this,errCh);
+}
+bool UtfForRangeIter::operator != (const UtfForRangeIter& other) const {
+	//check the position of the two iters
+	return pos != other.pos;
+}
+cpUcs4 UtfForRangeIter::operator * () {
+	return next_char;
+}
+const UtfForRangeIter& UtfForRangeIter::operator ++ () {
+	next_char = utf8IteratorGetNextCodePoint (this, errCh);
+	next_char == errCh ? pos = -1 : ++pos;
+	return that;
+}
+#if 0
+void UtfForRangeIter::reset () {
+	// reset iterator
+	utf8IteratorUninit (this);
+	utf8IteratorInit (this,str->data, str->slen);
+}
+cpUcs4 getChar (int npos) {
+	// get char at position pos
+	if (npos == pos)
+		return getCurrentChar();
+	if (npos < pos || pos == -1)
+		reset();
+	while (npos != pos)
+		++that;
+	return current_char;
+}
+#endif
+// UTF-8 CBString
+UtfForRangeIter CBString::begin () const {
+	return UtfForRangeIter (this,0);
+}
+UtfForRangeIter CBString::end () const {
+	return UtfForRangeIter (this,-1);
+}
+#if 0
+const std::string CBString::uAt(int pos) const {
+	cpUcs4 result{uRawAt(pos)};
+	return converter.to_bytes(result);
+}
+cpUcs4 CBString::uRawAt (int pos) const {
+	cpUcs4 result {iterator.getChar(pos)};
+	if (result == errCh)
+		return result;
+	bstringThrow ("Unfoundable position");
+}
+#endif
+	
+int CBString::uLength () const {
+	// Return the number
+	// of UTF-8 chars
+	int len{0};
+	for (int i{0};i<slen;++i)
+		len += (data[i] & 0xc0) != 0x80;
+	return len;
 }
 
 #if defined(BSTRLIB_CAN_USE_STL)
