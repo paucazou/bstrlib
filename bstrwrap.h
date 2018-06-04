@@ -516,11 +516,13 @@ struct CBStringList : public std::vector<CBString> {
 };
 #endif
 
+using str = CBString;
 } // namespace Bstrlib
 
 #if !defined (BSTRLIB_DONT_ASSUME_NAMESPACE)
 using namespace Bstrlib;
 #endif
+namespace bst = Bstrlib;
 
 #endif
 #endif
