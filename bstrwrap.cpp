@@ -1360,7 +1360,6 @@ UtfForRangeIter CBString::begin () const {
 UtfForRangeIter CBString::end () const {
 	return UtfForRangeIter (this,-1);
 }
-#if 0
 const std::string CBString::uAt(int pos) {
 	cpUcs4 result{uRawAt(pos)};
 	return utfconverter.to_bytes(result);
@@ -1380,7 +1379,6 @@ int CBString::uLength () const {
 	// of UTF-8 chars
 	return indexer.getLength();
 }
-#endif
 
 #if defined(BSTRLIB_CAN_USE_STL)
 

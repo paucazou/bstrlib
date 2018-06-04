@@ -433,7 +433,6 @@ struct CBString : public tagbstring {
 	// for range loop iterator
 	UtfForRangeIter begin () const;
 	UtfForRangeIter end () const;
-#if 0
 	// iterator used by at, rawAt, uRange
 	// at : a function returning utf-8 character at this position.
 	// It is designed for display.
@@ -445,7 +444,6 @@ struct CBString : public tagbstring {
 	// throw error if not found.
 	//  number of utf-8 char
 	int uLength () const;
-#endif
 
 	// CBStream methods
 	int gets (bNgetc getcPtr, void * parm, char terminator = '\n');
