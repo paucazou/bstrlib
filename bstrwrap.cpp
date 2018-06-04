@@ -80,6 +80,7 @@ CBString::CBString () {
 	} else {
 		data[0] = '\0';
 	}
+	indexer.reset();
 }
 
 CBString::CBString (const void * blk, int len) { 
@@ -96,6 +97,7 @@ CBString::CBString (const void * blk, int len) {
 		if (slen > 0) bstr__memcpy (data, blk, slen);
 		data[slen] = '\0';
 	}
+	indexer.reset();
 }
 
 CBString::CBString (char c, int len) {
@@ -112,6 +114,7 @@ CBString::CBString (char c, int len) {
 		if (slen > 0) bstr__memset (data, c, slen);
 		data[slen] = '\0';
 	}
+	indexer.reset();
 }
 
 CBString::CBString (char c) {
@@ -124,6 +127,7 @@ CBString::CBString (char c) {
 		data[0] = (unsigned char) c;
 		data[1] = '\0';
 	}
+	indexer.reset();
 }
 
 CBString::CBString (unsigned char c) {
@@ -136,6 +140,7 @@ CBString::CBString (unsigned char c) {
 		data[0] = c;
 		data[1] = '\0';
 	}
+	indexer.reset();
 }
 
 CBString::CBString (const char *s) {
@@ -146,6 +151,7 @@ CBString::CBString (const char *s) {
 		mlen = slen + 1;
 		if (NULL != (data = (unsigned char *) bstr__alloc (mlen))) {
 			bstr__memcpy (data, s, mlen);
+			indexer.reset();
 			return;
 		}
 	}
@@ -162,6 +168,7 @@ CBString::CBString (int len, const char *s) {
 		if (mlen < len) mlen = len;
 		if (NULL != (data = (unsigned char *) bstr__alloc (mlen))) {
 			bstr__memcpy (data, s, slen + 1);
+			indexer.reset();
 			return;
 		}
 	}
@@ -179,6 +186,7 @@ CBString::CBString (const CBString& b) {
 	} else {
 		bstr__memcpy (data, b.data, slen);
 		data[slen] = '\0';
+		indexer.reset();
 	}
 }
 
@@ -192,6 +200,7 @@ CBString::CBString (const tagbstring& x) {
 	} else {
 		bstr__memcpy (data, x.data, slen);
 		data[slen] = '\0';
+		indexer.reset();
 	}
 }
 CBString::CBString (const std::string& s) : CBString::CBString (s.data()) {
@@ -227,6 +236,7 @@ const CBString& CBString::operator = (char c) {
 		data[0] = (unsigned char) c;
 		data[1] = '\0';
 	}
+	indexer.reset();
 	return *this;
 }
 
@@ -241,6 +251,7 @@ const CBString& CBString::operator = (unsigned char c) {
 		data[0] = c;
 		data[1] = '\0';
 	}
+	indexer.reset();
 	return *this;
 }
 
@@ -261,6 +272,7 @@ size_t tmpSlen;
 		mlen = slen = 0;
 		bstringThrow ("Failure in =(const char *) operator");
 	}
+	indexer.reset();
 	return *this;
 }
 
@@ -276,6 +288,7 @@ const CBString& CBString::operator = (const CBString& b) {
 		bstr__memcpy (data, b.data, slen);
 		data[slen] = '\0';
 	}
+	indexer.reset();
 	return *this;
 }
 
@@ -292,6 +305,7 @@ const CBString& CBString::operator = (const tagbstring& x) {
 		bstr__memcpy (data, x.data, slen);
 		data[slen] = '\0';
 	}
+	indexer.reset();
 	return *this;
 }
 
@@ -299,6 +313,7 @@ const CBString& CBString::operator += (const CBString& b) {
 	if (BSTR_ERR == bconcat (this, (bstring) &b)) {
 		bstringThrow ("Failure in concatenate");
 	}
+	indexer.reset();
 	return *this;
 }
 
@@ -322,6 +337,7 @@ const CBString& CBString::operator += (const char *s) {
 	if (BSTR_ERR == bcatcstr (this, s)) {
 		bstringThrow ("Failure in concatenate");
 	}
+	indexer.reset();
 	return *this;
 }
 
@@ -329,6 +345,7 @@ const CBString& CBString::operator += (char c) {
 	if (BSTR_ERR == bconchar (this, c)) {
 		bstringThrow ("Failure in concatenate");
 	}
+	indexer.reset();
 	return *this;
 }
 
@@ -336,6 +353,7 @@ const CBString& CBString::operator += (unsigned char c) {
 	if (BSTR_ERR == bconchar (this, (char) c)) {
 		bstringThrow ("Failure in concatenate");
 	}
+	indexer.reset();
 	return *this;
 }
 
@@ -352,7 +370,13 @@ const CBString& CBString::operator += (const tagbstring& x) {
 		slen += x.slen;
 		data[slen] = '\0';
 	}
+	indexer.reset();
 	return *this;
+}
+const CBString& CBString::operator += (int i) {
+	that += CBString{i};
+	indexer.reset();
+	return that;
 }
 
 const CBString CBString::operator + (char c) const {
@@ -391,6 +415,11 @@ const CBString CBString::operator + (const tagbstring& x) const {
 	if (x.slen < 0) bstringThrow ("Failure in + (tagbstring) operator, badly formed tagbstring");
 	CBString retval (*this);
 	retval += x;
+	return retval;
+}
+const CBString CBString::operator + (int i) const {
+	CBString retval (that);
+	retval += i;
 	return retval;
 }
 
@@ -1276,6 +1305,9 @@ UtfForRangeIter::UtfForRangeIter (const CBString *nstr, int npos) :
 		utf8IteratorInit( this, nstr->data, nstr->slen);
 		next_char = utf8IteratorGetNextCodePoint (this,errCh);
 }
+UtfForRangeIter::~UtfForRangeIter () {
+	utf8IteratorUninit (this);
+}
 bool UtfForRangeIter::operator != (const UtfForRangeIter& other) const {
 	//check the position of the two iters
 	return pos != other.pos;
@@ -1291,27 +1323,34 @@ const UtfForRangeIter& UtfForRangeIter::operator ++ () {
 // Indexer
 UtfIndexer::UtfIndexer (const CBString& nstr) : str{nstr}
 {
-	reset();
 }
+UtfIndexer::~UtfIndexer () {
+	utf8IteratorUninit (this);
+}
+
 void UtfIndexer::reset () {
 	// reset iterator
 	utf8IteratorUninit (this);
-	utf8IteratorInit (this,str.data, str.slen);
-	current_char = utf8IteratorGetNextCodePoint (this, errCh);
+	pos = 0;
+	len = 0;
+	if (buIsUTF8Content (&str)) {
+		utf8IteratorInit (this,str.data, str.slen);
+		for (int i{0}; i < slen; ++i)
+			len += (data[i] & 0xc0) != 0x80;
+		current_char = utf8IteratorGetNextCodePoint (this, errCh);
+	}
 }
-UtfIndexer& UtfIndexer::operator ++ () {
-	current_char = utf8IteratorGetNextCodePoint (this, errCh);
-	pos = current_char == errCh ? -1 : pos + 1;
-	return this;
+int UtfIndexer::getLength () const {
+	return len;
 }
 cpUcs4 UtfIndexer::getChar (int npos) {
 	// get char at position pos
-	if (npos < pos || pos == -1)
+	if (npos >= len)
+		bstringThrow ("Position out of range");
+	if (npos < pos)
 		reset();
-	if (npos == pos)
-		return current_char;
-	while (npos != pos)
-		++that;
+	for (;pos != npos; ++pos)
+		current_char = utf8IteratorGetNextCodePoint(this,errCh);
 	return current_char;
 }
 // UTF-8 CBString
@@ -1322,26 +1361,26 @@ UtfForRangeIter CBString::end () const {
 	return UtfForRangeIter (this,-1);
 }
 #if 0
-const std::string CBString::uAt(int pos) const {
+const std::string CBString::uAt(int pos) {
 	cpUcs4 result{uRawAt(pos)};
-	return converter.to_bytes(result);
+	return utfconverter.to_bytes(result);
 }
-cpUcs4 CBString::uRawAt (int pos) const {
-	cpUcs4 result {iterator.getChar(pos)};
-	if (result == errCh)
-		return result;
-	bstringThrow ("Unfoundable position");
+cpUcs4 CBString::uRawAt (int pos) {
+	return indexer.getChar(pos);
 }
-#endif
-	
+CBString CBString::uRange (int start, int stop) {
+	// The implementation is pretty slow
+	std::string stdresult{""};
+	for (int pos{start}; pos <=stop; ++pos)
+		stdresult += uAt(pos);
+	return CBString (stdresult);
+}
 int CBString::uLength () const {
 	// Return the number
 	// of UTF-8 chars
-	int len{0};
-	for (int i{0};i<slen;++i)
-		len += (data[i] & 0xc0) != 0x80;
-	return len;
+	return indexer.getLength();
 }
+#endif
 
 #if defined(BSTRLIB_CAN_USE_STL)
 
@@ -1653,7 +1692,7 @@ void CBStringList::splitstr (const CBStream& b, const CBString& s) {
 
 #if defined(BSTRLIB_CAN_USE_IOSTREAM)
 
-std::ostream& operator << (std::ostream& sout, CBString b) {
+std::ostream& operator << (std::ostream& sout, const CBString &b) {
 	return sout.write ((const char *)b, b.length());
 }
 

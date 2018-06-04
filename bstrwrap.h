@@ -99,6 +99,8 @@ namespace Bstrlib {
 		 */
 		public:
 			UtfForRangeIter(const CBString* nstr, int npos = 0);
+			//UtfForRangeIter (const UtfForRangeIter & other);
+			~UtfForRangeIter ();
 			bool operator != (const UtfForRangeIter& other) const;
 			int operator * () ;
 			const UtfForRangeIter& operator ++ ();
@@ -115,14 +117,17 @@ namespace Bstrlib {
 		 */
 		public:
 			UtfIndexer (const CBString& nstr);
-			const UtfIndexer& operator ++ ();
+			//UtfIndexer (const UtfIndexer& other); // create an assignment overload ?
+			~UtfIndexer ();
 			void reset ();
+			int getLength () const;
 			cpUcs4 getChar (int npos);
 		private:
 			int pos{0};
 			cpUcs4 current_char{errCh};
 			UtfIndexer& that{*this};
-			CBString & str;
+			int len{0};
+			const CBString & str;
 	};
 
 #ifdef BSTRLIB_THROWS_EXCEPTIONS
@@ -223,10 +228,10 @@ friend struct CBString;
 struct CBString : public tagbstring {
 	private:
 		CBString& that{*this};
-		UtfIndexer indexer;
+		UtfIndexer indexer{*this};
 	public:
 
-	// Constructors
+	// Constructors 
 	CBString ();
 	CBString (char c);
 	CBString (unsigned char c);
@@ -266,6 +271,7 @@ struct CBString : public tagbstring {
 	const CBString& operator += (const char *s);
 	const CBString& operator += (const CBString& b);
 	const CBString& operator += (const tagbstring& x);
+	const CBString& operator += (int i);
 
 	// *= operator
 	inline const CBString& operator *= (int count) {
@@ -280,6 +286,7 @@ struct CBString : public tagbstring {
 	const CBString operator + (const char *s) const;
 	const CBString operator + (const CBString& b) const;
 	const CBString operator + (const tagbstring& x) const;
+	const CBString operator + (int i) const;
 
 	// * operator
 	inline const CBString operator * (int count) const {
@@ -361,7 +368,7 @@ struct CBString : public tagbstring {
 	int nreversefindchr (const CBString& b, int pos) const;
 	int nreversefindchr (const char * b, int pos) const;
 
-	// Search and substitute methods.
+	// Search and substitute methods. TODO indexer.reset not called
 	void findreplace (const CBString& find, const CBString& repl, int pos = 0);
 	void findreplace (const CBString& find, const char * repl, int pos = 0);
 	void findreplace (const char * find, const CBString& repl, int pos = 0);
@@ -374,7 +381,7 @@ struct CBString : public tagbstring {
 	// Extraction method.
 	const CBString midstr (int left, int len) const;
 
-	// Standard manipulation methods.
+	// Standard manipulation methods. TODO indexer.reset not called
 	void setsubstr (int pos, const CBString& b, unsigned char fill = ' ');
 	void setsubstr (int pos, const char * b, unsigned char fill = ' ');
 	void insert (int pos, const CBString& b, unsigned char fill = ' ');
@@ -385,7 +392,7 @@ struct CBString : public tagbstring {
 	void remove (int pos, int len);
 	void trunc (int len);
 
-	// Miscellaneous methods.
+	// Miscellaneous methods. TODO indexer.reset not called
 	void format (const char * fmt, ...);
 	void formata (const char * fmt, ...);
 	void fill (int length, unsigned char fill = ' ');
@@ -408,7 +415,7 @@ struct CBString : public tagbstring {
 	inline bool iswriteprotected () const { return mlen <= 0; }
 
 #if defined(BSTRLIB_CAN_USE_STL)
-	// Join methods.
+	// Join methods. TODO indexer.reset not called
 	void join (const struct CBStringList& l);
 	void join (const struct CBStringList& l, const CBString& sep);
 	void join (const struct CBStringList& l, char sep);
@@ -430,15 +437,15 @@ struct CBString : public tagbstring {
 	// iterator used by at, rawAt, uRange
 	// at : a function returning utf-8 character at this position.
 	// It is designed for display.
-	const std::string uAt(int pos) const;
+	const std::string uAt(int pos) ;
 	// rawAt : a function returning a cpUcs4
-	cpUcs4 uRawAt (int pos) const;
+	cpUcs4 uRawAt (int pos) ;
 	// uRange: CBString between start and stop
-	//CBString uRange (int start, int stop) const; TODO
+	CBString uRange (int start, int stop) ; 
 	// throw error if not found.
-#endif
 	//  number of utf-8 char
 	int uLength () const;
+#endif
 
 	// CBStream methods
 	int gets (bNgetc getcPtr, void * parm, char terminator = '\n');
@@ -456,7 +463,7 @@ inline const CBString operator * (int count, const CBString& b) {
 }
 
 #if defined(BSTRLIB_CAN_USE_IOSTREAM)
-extern std::ostream& operator << (std::ostream& sout, CBString b);
+extern std::ostream& operator << (std::ostream& sout, const CBString &b);
 extern std::istream& operator >> (std::istream& sin, CBString& b);
 extern std::istream& getline (std::istream& sin, CBString& b, char terminator='\n');
 #endif
