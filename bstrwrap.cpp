@@ -1231,6 +1231,19 @@ CBString CBString::getLine (const int linenb) const {
 		bstringThrow ("getLine: line requested was not found");
 	return temp;
 }
+int CBString::lineNumber () const {
+	/* Find the number of lines in a string.
+	 * If the last line has a trailing '\n',
+	 * does not count it as two lines
+	 */
+	int nb{0};
+	for (int i{0}; i < slen; ++i)
+		if (that[i] == '\n')
+			++nb;
+	if (that[slen-1] != '\n')
+		++nb;
+	return nb;
+}
 
 void CBString::repeat (int count) {
 	count *= slen;

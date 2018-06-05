@@ -408,6 +408,8 @@ struct CBString : public tagbstring {
 	void capitalize ();
 	// get the content of the line number... A line ends with '\n'. First line = 1
 	CBString getLine(const int) const;
+	// get number of lines
+	int lineNumber () const;
 
 	// Write protection methods.
 	void writeprotect ();
