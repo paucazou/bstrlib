@@ -228,7 +228,7 @@ friend struct CBString;
 struct CBString : public tagbstring {
 	private:
 		CBString& that{*this};
-		UtfIndexer indexer{*this};
+		UtfIndexer* const indexer {new UtfIndexer{*this}};
 	public:
 
 	// Constructors 
@@ -438,11 +438,11 @@ struct CBString : public tagbstring {
 	// iterator used by at, rawAt, uRange
 	// at : a function returning utf-8 character at this position.
 	// It is designed for display.
-	const std::string uAt(int pos) ;
+	const CBString uAt(int pos) const;
 	// rawAt : a function returning a cpUcs4
-	cpUcs4 uRawAt (int pos) ;
+	cpUcs4 uRawAt (int pos) const;
 	// uRange: CBString between start and stop
-	CBString uRange (int start, int stop) ; 
+	CBString uRange (int start, int stop) const; 
 	// throw error if not found.
 	//  number of utf-8 char
 	int uLength () const;

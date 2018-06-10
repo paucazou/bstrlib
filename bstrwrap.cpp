@@ -80,7 +80,7 @@ CBString::CBString () {
 	} else {
 		data[0] = '\0';
 	}
-	indexer.reset();
+	indexer->reset();
 }
 
 CBString::CBString (const void * blk, int len) { 
@@ -97,7 +97,7 @@ CBString::CBString (const void * blk, int len) {
 		if (slen > 0) bstr__memcpy (data, blk, slen);
 		data[slen] = '\0';
 	}
-	indexer.reset();
+	indexer->reset();
 }
 
 CBString::CBString (char c, int len) {
@@ -114,7 +114,7 @@ CBString::CBString (char c, int len) {
 		if (slen > 0) bstr__memset (data, c, slen);
 		data[slen] = '\0';
 	}
-	indexer.reset();
+	indexer->reset();
 }
 
 CBString::CBString (char c) {
@@ -127,7 +127,7 @@ CBString::CBString (char c) {
 		data[0] = (unsigned char) c;
 		data[1] = '\0';
 	}
-	indexer.reset();
+	indexer->reset();
 }
 
 CBString::CBString (unsigned char c) {
@@ -140,7 +140,7 @@ CBString::CBString (unsigned char c) {
 		data[0] = c;
 		data[1] = '\0';
 	}
-	indexer.reset();
+	indexer->reset();
 }
 
 CBString::CBString (const char *s) {
@@ -151,7 +151,7 @@ CBString::CBString (const char *s) {
 		mlen = slen + 1;
 		if (NULL != (data = (unsigned char *) bstr__alloc (mlen))) {
 			bstr__memcpy (data, s, mlen);
-			indexer.reset();
+			indexer->reset();
 			return;
 		}
 	}
@@ -168,7 +168,7 @@ CBString::CBString (int len, const char *s) {
 		if (mlen < len) mlen = len;
 		if (NULL != (data = (unsigned char *) bstr__alloc (mlen))) {
 			bstr__memcpy (data, s, slen + 1);
-			indexer.reset();
+			indexer->reset();
 			return;
 		}
 	}
@@ -186,7 +186,7 @@ CBString::CBString (const CBString& b) {
 	} else {
 		bstr__memcpy (data, b.data, slen);
 		data[slen] = '\0';
-		indexer.reset();
+		indexer->reset();
 	}
 }
 
@@ -200,7 +200,7 @@ CBString::CBString (const tagbstring& x) {
 	} else {
 		bstr__memcpy (data, x.data, slen);
 		data[slen] = '\0';
-		indexer.reset();
+		indexer->reset();
 	}
 }
 CBString::CBString (const std::string& s) : CBString::CBString (s.data()) {
@@ -221,6 +221,7 @@ CBString::~CBString () {
 	}
 	mlen = 0;
 	slen = -__LINE__;
+	delete indexer;
 }
 
 // = operator.
@@ -236,7 +237,7 @@ const CBString& CBString::operator = (char c) {
 		data[0] = (unsigned char) c;
 		data[1] = '\0';
 	}
-	indexer.reset();
+	indexer->reset();
 	return *this;
 }
 
@@ -251,7 +252,7 @@ const CBString& CBString::operator = (unsigned char c) {
 		data[0] = c;
 		data[1] = '\0';
 	}
-	indexer.reset();
+	indexer->reset();
 	return *this;
 }
 
@@ -272,7 +273,7 @@ size_t tmpSlen;
 		mlen = slen = 0;
 		bstringThrow ("Failure in =(const char *) operator");
 	}
-	indexer.reset();
+	indexer->reset();
 	return *this;
 }
 
@@ -288,7 +289,7 @@ const CBString& CBString::operator = (const CBString& b) {
 		bstr__memcpy (data, b.data, slen);
 		data[slen] = '\0';
 	}
-	indexer.reset();
+	indexer->reset();
 	return *this;
 }
 
@@ -305,7 +306,7 @@ const CBString& CBString::operator = (const tagbstring& x) {
 		bstr__memcpy (data, x.data, slen);
 		data[slen] = '\0';
 	}
-	indexer.reset();
+	indexer->reset();
 	return *this;
 }
 
@@ -313,7 +314,7 @@ const CBString& CBString::operator += (const CBString& b) {
 	if (BSTR_ERR == bconcat (this, (bstring) &b)) {
 		bstringThrow ("Failure in concatenate");
 	}
-	indexer.reset();
+	indexer->reset();
 	return *this;
 }
 
@@ -337,7 +338,7 @@ const CBString& CBString::operator += (const char *s) {
 	if (BSTR_ERR == bcatcstr (this, s)) {
 		bstringThrow ("Failure in concatenate");
 	}
-	indexer.reset();
+	indexer->reset();
 	return *this;
 }
 
@@ -345,7 +346,7 @@ const CBString& CBString::operator += (char c) {
 	if (BSTR_ERR == bconchar (this, c)) {
 		bstringThrow ("Failure in concatenate");
 	}
-	indexer.reset();
+	indexer->reset();
 	return *this;
 }
 
@@ -353,7 +354,7 @@ const CBString& CBString::operator += (unsigned char c) {
 	if (BSTR_ERR == bconchar (this, (char) c)) {
 		bstringThrow ("Failure in concatenate");
 	}
-	indexer.reset();
+	indexer->reset();
 	return *this;
 }
 
@@ -370,12 +371,12 @@ const CBString& CBString::operator += (const tagbstring& x) {
 		slen += x.slen;
 		data[slen] = '\0';
 	}
-	indexer.reset();
+	indexer->reset();
 	return *this;
 }
 const CBString& CBString::operator += (int i) {
 	that += CBString{i};
-	indexer.reset();
+	indexer->reset();
 	return that;
 }
 
@@ -1373,24 +1374,24 @@ UtfForRangeIter CBString::begin () const {
 UtfForRangeIter CBString::end () const {
 	return UtfForRangeIter (this,-1);
 }
-const std::string CBString::uAt(int pos) {
+const CBString CBString::uAt(int pos) const{
 	cpUcs4 result{uRawAt(pos)};
-	return utfconverter.to_bytes(result);
+	return CBString{utfconverter.to_bytes(result)};
 }
-cpUcs4 CBString::uRawAt (int pos) {
-	return indexer.getChar(pos);
+cpUcs4 CBString::uRawAt (int pos) const {
+	return indexer->getChar(pos);
 }
-CBString CBString::uRange (int start, int stop) {
+CBString CBString::uRange (int start, int stop) const{
 	// The implementation is pretty slow
-	std::string stdresult{""};
+	CBString stdresult{""};
 	for (int pos{start}; pos <=stop; ++pos)
 		stdresult += uAt(pos);
-	return CBString (stdresult);
+	return stdresult;
 }
 int CBString::uLength () const {
 	// Return the number
 	// of UTF-8 chars
-	return indexer.getLength();
+	return indexer->getLength();
 }
 
 #if defined(BSTRLIB_CAN_USE_STL)
