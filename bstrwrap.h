@@ -322,6 +322,7 @@ struct CBString : public tagbstring {
 	operator float () const;
 	operator int () const;
 	operator unsigned int () const;
+	operator bool () const;
 
 	// Accessors
 	inline int length () const {return slen;}

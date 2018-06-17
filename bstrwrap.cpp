@@ -566,6 +566,19 @@ unsigned int d = 0;
 	return d;
 }
 
+CBString::operator bool () const {
+	/* This cast is really different from
+	 * the others,
+	 * since it does not try to convert
+	 * the content of the string
+	 * into a bool,
+	 * but return false if
+	 * the string is empty,
+	 * true otherwise
+	 */
+	return slen != 0;
+}
+
 #ifdef __TURBOC__
 # ifndef BSTRLIB_NOVSNP
 #  define BSTRLIB_NOVSNP
