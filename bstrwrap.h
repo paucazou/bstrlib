@@ -444,6 +444,9 @@ struct CBString : public tagbstring {
 	cpUcs4 uRawAt (int pos) const;
 	// uRange: CBString between start and stop
 	CBString uRange (int start, int stop) const; 
+	// research methods: number of times a char is in a string
+	int findNbOf (cpUcs4 c, int start=0, int end=-1) const;
+	int findNbOf (CBString c, int start=0, int end=-1) const;
 	// throw error if not found.
 	//  number of utf-8 char
 	int uLength () const;

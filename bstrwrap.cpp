@@ -1401,6 +1401,35 @@ CBString CBString::uRange (int start, int stop) const{
 		stdresult += uAt(pos);
 	return stdresult;
 }
+int CBString::findNbOf (cpUcs4 c, int start, int end) const {
+	/* Find the number of times
+	 * c is in string.
+	 * If end == -1, look until the end
+	 * of the string.
+	 */
+	if (end >= uLength())
+		bstringThrow("end argument is too large");
+	if (end == -1)
+		end == uLength();
+
+	int nb{0};
+	for (int i{start};start<=end;++start)
+		if (uRawAt(i) == c)
+			++nb;
+
+	return nb;
+}
+
+int CBString::findNbOf (CBString c, int start, int end) const {
+	/* Overloaded function.
+	 * c must match with a single
+	 * character
+	 */
+	if (c.uLength() > 1)
+		bstringThrow("c must contain only one character");
+
+	return findNbOf(c.uRawAt(0),start,end);
+}
 int CBString::uLength () const {
 	// Return the number
 	// of UTF-8 chars
