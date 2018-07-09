@@ -243,6 +243,7 @@ struct CBString : public tagbstring {
 	CBString (const void * blk, int len);
 	CBString (const std::string& s);
 	CBString (const int i);
+	CBString (const unsigned i);
 	CBString (const double i);
 
 #if defined(BSTRLIB_CAN_USE_STL)
@@ -272,6 +273,7 @@ struct CBString : public tagbstring {
 	const CBString& operator += (const CBString& b);
 	const CBString& operator += (const tagbstring& x);
 	const CBString& operator += (int i);
+	const CBString& operator += (unsigned i);
 
 	// *= operator
 	inline const CBString& operator *= (int count) {
@@ -287,6 +289,7 @@ struct CBString : public tagbstring {
 	const CBString operator + (const CBString& b) const;
 	const CBString operator + (const tagbstring& x) const;
 	const CBString operator + (int i) const;
+	const CBString operator + (unsigned int i) const;
 
 	// * operator
 	inline const CBString operator * (int count) const {
@@ -447,6 +450,8 @@ struct CBString : public tagbstring {
 	// research methods: number of times a char is in a string
 	int findNbOf (cpUcs4 c, int start=0, int end=-1) const;
 	int findNbOf (CBString c, int start=0, int end=-1) const;
+	// insert methods
+	void uInsert(int pos, const CBString& s);
 	// throw error if not found.
 	//  number of utf-8 char
 	int uLength () const;

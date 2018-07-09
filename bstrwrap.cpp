@@ -206,7 +206,12 @@ CBString::CBString (const tagbstring& x) {
 CBString::CBString (const std::string& s) : CBString::CBString (s.data()) {
 }
 
-CBString::CBString (const int i): CBString::CBString{std::to_string(i)}{
+CBString::CBString (const int i): CBString::CBString{std::to_string(i)}
+{
+}
+
+CBString::CBString (const unsigned i): CBString::CBString{std::to_string(i)}
+{
 }
 
 CBString::CBString (const double i): CBString::CBString{std::to_string(i)}{
@@ -380,6 +385,12 @@ const CBString& CBString::operator += (int i) {
 	return that;
 }
 
+const CBString& CBString::operator += (unsigned i) {
+	that += CBString{i};
+	indexer->reset();
+	return that;
+}
+
 const CBString CBString::operator + (char c) const {
 	CBString retval (*this);
 	retval += c;
@@ -419,6 +430,12 @@ const CBString CBString::operator + (const tagbstring& x) const {
 	return retval;
 }
 const CBString CBString::operator + (int i) const {
+	CBString retval (that);
+	retval += i;
+	return retval;
+}
+
+const CBString CBString::operator + (unsigned i) const {
 	CBString retval (that);
 	retval += i;
 	return retval;
@@ -1429,6 +1446,17 @@ int CBString::findNbOf (CBString c, int start, int end) const {
 		bstringThrow("c must contain only one character");
 
 	return findNbOf(c.uRawAt(0),start,end);
+}
+void CBString::uInsert (int pos, const CBString& s) {
+	/* Insert s at pos
+	 * Horrible implementation
+	 */
+	CBString newstring;
+	if (pos != 0)
+		newstring = uRange(0,pos-1);
+	newstring += s;
+	newstring += uRange(pos,uLength()-1);
+	*this = newstring;
 }
 int CBString::uLength () const {
 	// Return the number
