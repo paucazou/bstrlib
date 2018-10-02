@@ -1408,6 +1408,15 @@ const CBString CBString::uAt(int pos) const{
 	cpUcs4 result{uRawAt(pos)};
 	return CBString{utfconverter.to_bytes(result)};
 }
+
+void CBString::uReplace(int pos, const CBString& c) {
+	/* Replace char at pos by c
+	 */
+	CBString ns{this->uRange(0,pos -1)};
+	ns += c;
+	ns += this->uRange(pos+1,this->uLength()-1);
+	*this = ns;
+}
 cpUcs4 CBString::uRawAt (int pos) const {
 	return indexer->getChar(pos);
 }

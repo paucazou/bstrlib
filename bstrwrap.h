@@ -443,6 +443,8 @@ struct CBString : public tagbstring {
 	// at : a function returning utf-8 character at this position.
 	// It is designed for display.
 	const CBString uAt(int pos) const;
+	// replace a utf8 char by another one
+	void uReplace(int pos,const CBString& c);
 	// rawAt : a function returning a cpUcs4
 	cpUcs4 uRawAt (int pos) const;
 	// uRange: CBString between start and stop
